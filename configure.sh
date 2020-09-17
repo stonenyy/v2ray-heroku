@@ -17,6 +17,7 @@ cat << EOF > /usr/local/etc/v2ray/config.json
     "inbounds": [
         {
             "port": $PORT,
+            "tag": "VLESS-in",
             "protocol": "vless",
             "settings": {
                 "clients": [
@@ -25,18 +26,50 @@ cat << EOF > /usr/local/etc/v2ray/config.json
                         "alterId": 0
                     }
                 ],
-                "disableInsecureEncryption": true
+                "decryption": true
             },
             "streamSettings": {
-                "network": "ws"
+                "network": "ws",
+                "wsSettings": {
+                    "path":"/"
+                }
             }
         }
     ],
     "outbounds": [
         {
-            "protocol": "freedom"
+            "protocol": "freedom",
+            "settings": { },
+            "tag": "direct"
+        },
+        {
+            "protocol": "blackhole",
+            "settings": { },
+            "tag": "blocked"
         }
-    ]
+    ], 
+    "dns": {
+      "servers": [
+        "https+local://1.1.1.1/dns-query",
+	    "1.1.1.1",
+	    "1.0.0.1",
+	    "8.8.8.8",
+	    "8.8.4.4",
+	    "localhost"
+      ]
+    },
+    "routing": {
+        "domainStrategy": "AsIs",
+        "rules": [
+            {
+                "type": "field",
+                "inboundTag": [
+                    "VLESS-in"
+                ],
+                "outboundTag": "direct"
+            }
+        ]
+    }
 }
 EOF
 
